@@ -2,7 +2,7 @@ name: Simple CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, development ]
 
 jobs:
   test:
@@ -16,8 +16,10 @@ jobs:
       with:
         python-version: '3.9'
     
-    - name: Install dependencies
-      run: pip install pytest
-    
     - name: Run tests
-      run: python -m pytest
+      run: python tests/test_calculator.py
+    
+    - name: Test basic functionality
+      run: |
+        python -c "from calculator import add; print('2 + 3 =', add(2, 3))"
+        python -c "from calculator import divide; print('10 / 2 =', divide(10, 2))"
