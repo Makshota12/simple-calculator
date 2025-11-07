@@ -1,18 +1,18 @@
-# Calculator Documentation
+# 📚 Calculator Documentation
 
-## Functions
+## Available Functions
 
-### add(a, b)
-Returns the sum of two numbers.
+- **add(a, b)** - Adds two numbers
+- **subtract(a, b)** - Subtracts two numbers
+- **multiply(a, b)** - Multiplies two numbers
 
-### subtract(a, b)  
-Returns the difference between two numbers.
+## Quick Start
+```python
+from calculator import add, subtract, multiply
 
-### multiply(a, b)
-Returns the product of two numbers.
+result = add(2, 3)      # 5
+result = subtract(5, 3) # 2
+result = multiply(3, 4) # 12
+```
 
-### divide(a, b)
-Returns the quotient of two numbers. Raises ValueError if divisor is zero.
-
-```bash
-python tests/test_calculator.py
+*Last updated: Fri Nov  7 11:00:43 UTC 2025*
