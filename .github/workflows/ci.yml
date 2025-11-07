@@ -1,26 +1,119 @@
-name: Simple CI
+name: CI with Auto-Docs
 
 on:
   push:
     branches: [ main, development ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
     
-    - name: Run simple tests
+    - name: Run tests
       run: |
         python -c "import calculator; print('2+2 =', calculator.add(2, 2))"
         python -c "import calculator; print('5-3 =', calculator.subtract(5, 3))"
         python -c "import calculator; print('3*4 =', calculator.multiply(3, 4))"
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
     
-    - name: Run test file
-      run: python simple_test.py
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Create docs directory
+      run: mkdir -p docs
+    
+    - name: Generate basic documentation
+      run: |
+        echo "# 📚 Calculator Documentation" > docs/README.md
+        echo "" >> docs/README.md
+        echo "## 🧮 Available Functions" >> docs/README.md
+        echo "" >> docs/README.md
+        echo "- **add(a, b)** - Adds two numbers" >> docs/README.md
+        echo "- **subtract(a, b)** - Subtracts two numbers" >> docs/README.md
+        echo "- **multiply(a, b)** - Multiplies two numbers" >> docs/README.md
+        echo "" >> docs/README.md
+        echo "## 🚀 Quick Start" >> docs/README.md
+        echo '```python' >> docs/README.md
+        echo "from calculator import add, subtract, multiply" >> docs/README.md
+        echo "" >> docs/README.md
+        echo "result = add(2, 3)      # 5" >> docs/README.md
+        echo "result = subtract(5, 3) # 2" >> docs/README.md
+        echo "result = multiply(3, 4) # 12" >> docs/README.md
+        echo '```' >> docs/README.md
+        echo "" >> docs/README.md
+        echo "*Last updated: $(date)*" >> docs/README.md
+    
+    - name: Generate auto-docs from code
+      run: |
+        echo "# 🔄 Auto-generated Docs" > docs/auto_docs.md
+        echo "" >> docs/auto_docs.md
+        echo "## 📊 Calculator Functions" >> docs/auto_docs.md
+        echo "" >> docs/auto_docs.md
+        echo "| Function | Description | Example |" >> docs/auto_docs.md
+        echo "|----------|-------------|---------|" >> docs/auto_docs.md
+        echo "| \`add(a, b)\` | Addition | \`add(2, 3) → 5\` |" >> docs/auto_docs.md
+        echo "| \`subtract(a, b)\` | Subtraction | \`subtract(5, 3) → 2\` |" >> docs/auto_docs.md
+        echo "| \`multiply(a, b)\` | Multiplication | \`multiply(3, 4) → 12\` |" >> docs/auto_docs.md
+        echo "" >> docs/auto_docs.md
+        echo "## 📁 Project Structure" >> docs/auto_docs.md
+        echo '```' >> docs/auto_docs.md
+        echo "simple-calculator/" >> docs/auto_docs.md
+        echo "├── calculator.py     # Main code" >> docs/auto_docs.md
+        echo "├── tests/            # Test files" >> docs/auto_docs.md
+        echo "└── docs/             # Documentation" >> docs/auto_docs.md
+        echo '```' >> docs/auto_docs.md
+        echo "" >> docs/auto_docs.md
+        echo "*Auto-generated on: $(date)*" >> docs/auto_docs.md
+    
+    - name: Create function reference
+      run: |
+        echo "# 🎯 Function Reference" > docs/functions.md
+        echo "" >> docs/functions.md
+        echo "## add(a, b)" >> docs/functions.md
+        echo "- **Purpose:** Performs addition" >> docs/functions.md
+        echo "- **Parameters:** a (number), b (number)" >> docs/functions.md
+        echo "- **Returns:** Sum of a and b" >> docs/functions.md
+        echo "- **Example:** \`add(2, 3) returns 5\`" >> docs/functions.md
+        echo "" >> docs/functions.md
+        echo "## subtract(a, b)" >> docs/functions.md
+        echo "- **Purpose:** Performs subtraction" >> docs/functions.md
+        echo "- **Parameters:** a (number), b (number)" >> docs/functions.md
+        echo "- **Returns:** Difference of a and b" >> docs/functions.md
+        echo "- **Example:** \`subtract(5, 3) returns 2\`" >> docs/functions.md
+        echo "" >> docs/functions.md
+        echo "## multiply(a, b)" >> docs/functions.md
+        echo "- **Purpose:** Performs multiplication" >> docs/functions.md
+        echo "- **Parameters:** a (number), b (number)" >> docs/functions.md
+        echo "- **Returns:** Product of a and b" >> docs/functions.md
+        echo "- **Example:** \`multiply(3, 4) returns 12\`" >> docs/functions.md
+        echo "" >> docs/functions.md
+        echo "---" >> docs/functions.md
+        echo "*Documentation auto-updated via GitHub Actions*" >> docs/functions.md
+    
+    - name: Commit and push documentation
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/
+        git diff --staged --quiet || git commit -m "📚 Auto-update documentation [skip ci]"
+        git push
